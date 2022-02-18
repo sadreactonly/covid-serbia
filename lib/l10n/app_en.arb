@@ -1,0 +1,8 @@
+{
+  "appTitle": "COVID 19",
+  "qrCert" : "Covid certificate",
+  "empty" : "Add a covid certificate.",
+  "tested24": "PEOPLE TESTED IN LAST 24 HOURS",
+  "infected24": "CASES CONFIRMED IN LAST 24 HOURS",
+  "deceased24": "DEATHS IN LAST 24 HOURS"
+}

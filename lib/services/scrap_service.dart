@@ -23,7 +23,7 @@ class ScrapService {
     try {
       if (await webScraper.loadWebPage(CovidStatsHelper.path)) {
         List<Map<String, dynamic>> elements =
-            webScraper.getElement(CovidStatsHelper.confirmedCases, []);
+            webScraper.getElement(CovidStatsHelper.infected24hours, []);
         return elements[0]['title'];
       }
     } on WebScraperException catch (e) {

@@ -1,8 +1,13 @@
-import 'package:covid_certificate_shortcut/screens/qr_code_screen.dart';
-import 'package:covid_certificate_shortcut/shared/routes.dart';
-import 'package:covid_certificate_shortcut/theme/colors.dart';
+import 'package:covid_certificate_shortcut/providers/stats_provider.dart';
+import 'package:covid_certificate_shortcut/widgets/language_picker.dart';
+import 'package:covid_certificate_shortcut/widgets/qr_card.dart';
 import 'package:covid_certificate_shortcut/widgets/stats_card.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../theme/colors.dart';
+import '../theme/theme_data.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -17,50 +22,45 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  List<Widget> _createAppBarActions() {
-    return [
-      IconButton(
-        icon: const Icon(Icons.settings),
-        onPressed: _onSettingsPressed,
-      )
-    ];
-  }
-
-  _onSettingsPressed() {
-    Navigator.pushNamed(context, Routes.settings);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: AppColors.blue,
-          leading: Padding(
-              child: Image.asset("assets/logo.png"),
-              padding: const EdgeInsets.all(5)),
-          //title: Text(StringResources.title),
-          actions: _createAppBarActions()),
+        backgroundColor: AppColors.blue,
+        leading: const Icon(
+          Icons.coronavirus_outlined,
+        ),
+        title: Text(AppLocalizations.of(context)!.appTitle),
+        
+      ),
       body: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/bg.png"),
-              fit: BoxFit.cover,
-            ),
-          ),
+          height: double.maxFinite,
+          decoration: appBackground,
           width: double.maxFinite,
-          child: SingleChildScrollView(
-              child: Column(
-            children: const [
-              QrCodeScreen(),
-              StatsCard(
-                  title: "БРОЈ ТЕСТИРАНИХ ОСОБА У ПОСЛЕДЊА 24 ЧАСА",
-                  number: '111'),
-              StatsCard(
-                  title: "БРОЈ ПОТВРЂЕНИХ СЛУЧАЈЕВА У ПОСЛЕДЊА 24 ЧАСА",
-                  number: '111'),
-              StatsCard(
-                  title: "БРОЈ ПРЕМИНУЛИХ ОСОБА У ПОСЛЕДЊА 24 ЧАСА",
-                  number: '111'),
+          child: SingleChildScrollView(child: Column(
+            children: [
+              const QrCard(),
+              Consumer<StatsProvider>(
+                builder: (context, provider, child) {
+                  return StatsCard(
+                      title: AppLocalizations.of(context)!.tested24,
+                      number: provider.tested24hours);
+                },
+              ),
+              Consumer<StatsProvider>(
+                builder: (context, provider, child) {
+                  return StatsCard(
+                      title: AppLocalizations.of(context)!.infected24,
+                      number: provider.infected24hours);
+                },
+              ),
+              Consumer<StatsProvider>(
+                builder: (context, provider, child) {
+                  return StatsCard(
+                      title: AppLocalizations.of(context)!.deceased24,
+                      number: provider.deceased24hours);
+                },
+              ),
             ],
           ))),
     );

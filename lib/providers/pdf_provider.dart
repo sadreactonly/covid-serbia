@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -9,9 +8,9 @@ import 'package:pdfx/pdfx.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PdfProvider extends ChangeNotifier {
-  String _path = '';
+  String _pdfPath = '';
 
-  String get path => _path;
+  String get pdfPath => _pdfPath;
 
   String _pdfImagePath = '';
 
@@ -21,30 +20,37 @@ class PdfProvider extends ChangeNotifier {
 
   String get qrImagePath => _qrImagePath;
 
+
   setFile(File tmp) {
     _saveQR(tmp.readAsBytesSync());
     notifyListeners();
   }
 
-  Future<bool> doesPathExist() async {
+  Future init() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var pdfPath = prefs.getString("qrImagePath");
-    if (pdfPath != null) {
-      _qrImagePath = pdfPath.toString();
-      return true;
+    var qrImagePath = prefs.getString("qrImagePath");
+    var pdfPath = prefs.getString("pdfPath");
+    if (qrImagePath != null && pdfPath != null) {
+      _pdfPath = pdfPath.toString();
+      _qrImagePath = qrImagePath.toString();
     }
-    return false;
   }
 
-  Future addCertificatePressed() async {
+  Future<bool> addCertificatePressed() async {
     FilePickerResult? result = await FilePicker.platform
         .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
 
     if (result != null) {
-      await _convertPdfToImage(result.files.single.path.toString());
+      _pdfPath = result.files.single.path.toString();
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('pdfPath', _pdfPath);
+      await _convertPdfToImage(_pdfPath);
 
       notifyListeners();
+      return true;
     }
+    return false;
   }
 
   Future _convertPdfToImage(path) async {
@@ -59,12 +65,8 @@ class PdfProvider extends ChangeNotifier {
     await _saveImage(pageImage!.bytes);
   }
 
-  String _base64String(Uint8List data) {
-    return base64Encode(data);
-  }
-
   Future _saveQR(imageRaw) async {
-    _qrImagePath = _base64String(imageRaw);
+    _qrImagePath = base64Encode(imageRaw);
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('qrImagePath', _qrImagePath);

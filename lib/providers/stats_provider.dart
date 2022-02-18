@@ -2,15 +2,15 @@ import 'package:covid_certificate_shortcut/services/scrap_service.dart';
 import 'package:flutter/foundation.dart';
 
 class StatsProvider extends ChangeNotifier {
-  String _tested24hours = '';
+  String _tested24hours = '0';
 
   String get tested24hours => _tested24hours;
 
-  String _infected24hours = '';
+  String _infected24hours = '0';
 
   String get infected24hours => _infected24hours;
 
-  String _deceased24hours = '';
+  String _deceased24hours = '0';
 
   String get deceased24hours => _deceased24hours;
 
